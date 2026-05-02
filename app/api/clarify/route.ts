@@ -66,7 +66,7 @@ export async function POST(request: Request) {
         let generationText = '';
         const genStream = await anthropic.messages.stream({
           model: DEFAULT_MODEL,
-          max_tokens: 4096,
+          max_tokens: 8192,
           system: IDEATION_SYSTEM_PROMPT,
           messages: [
             understandingMessage,

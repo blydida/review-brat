@@ -42,7 +42,7 @@ export async function POST(request: Request) {
 
         const response = await anthropic.messages.create({
           model: DEFAULT_MODEL,
-          max_tokens: 4096,
+          max_tokens: 8192,
           system: FLOW_REVIEW_SYSTEM_PROMPT,
           messages: [reviewMessage],
         });

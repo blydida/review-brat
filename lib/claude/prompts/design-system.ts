@@ -79,7 +79,7 @@ BORDER RADIUS:
 IMPORTANT: When naming UI components in screen descriptions, use ONLY component names from the list above. Reference token names (accent, surface, foregroundMuted, etc.) when describing colors.`;
 
 export function buildDesignSystemContext(ds: DesignSystemConfig | undefined): string {
-  if (!ds) return '';
+  if (!ds) return HEROUI_PRESET_CONTEXT;
 
   if (ds.type === 'preset' && ds.name === 'heroui') {
     return HEROUI_PRESET_CONTEXT;
