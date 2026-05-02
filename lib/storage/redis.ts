@@ -1,22 +1,29 @@
-import { Redis } from '@upstash/redis';
+import { createClient } from '@supabase/supabase-js';
 import type { Session, SessionStatus, AnalysisResult, Upload } from '@/types/session';
 import type { DesignSystemConfig } from '@/types/design-system';
 
-const redis = new Redis({
-  url: process.env.UPSTASH_REDIS_REST_URL!,
-  token: process.env.UPSTASH_REDIS_REST_TOKEN!,
-});
-
-const SESSION_TTL = 60 * 60 * 24; // 24 hours
-const key = (id: string) => `session:${id}`;
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!,
+);
 
 export async function getSession(id: string): Promise<Session | null> {
-  const data = await redis.get<Session>(key(id));
-  return data;
+  const { data, error } = await supabase
+    .from('sessions')
+    .select('data')
+    .eq('id', id)
+    .single();
+
+  if (error || !data) return null;
+  return data.data as Session;
 }
 
 export async function setSession(session: Session): Promise<void> {
-  await redis.set(key(session.id), session, { ex: SESSION_TTL });
+  await supabase.from('sessions').upsert({
+    id: session.id,
+    data: session,
+    updated_at: new Date().toISOString(),
+  });
 }
 
 export async function updateSessionStatus(id: string, status: SessionStatus, error?: string): Promise<void> {
