@@ -17,26 +17,26 @@ const MODES: Array<{
   {
     mode: 'ideation',
     icon: <Lightbulb className="w-7 h-7" />,
-    title: 'Ideation → Structure',
-    subtitle: 'Transform raw ideas into a validated product spec',
+    title: 'Идея → Экраны',
+    subtitle: 'Превращает сырую идею в готовые экраны с дизайном',
     features: [
-      'Upload PRD, notes, or wireframe images',
-      'AI extracts user goals, business goals, key mechanics',
-      'Clarifying questions when needed',
-      'Generates user flow diagram + screen specs',
+      'Загрузи PRD, заметки или изображения',
+      'AI извлекает цели, механики, суть задачи',
+      'Уточняющие вопросы при необходимости',
+      'Генерирует детализированные экраны по компонентам HeroUI',
     ],
     colorClass: 'from-violet-500/10 to-purple-500/5 border-violet-500/20 hover:border-violet-500/50',
   },
   {
     mode: 'flow-review',
     icon: <ScanSearch className="w-7 h-7" />,
-    title: 'Flow Review',
-    subtitle: 'Analyze an existing design as a complete user scenario',
+    title: 'Ревью флоу',
+    subtitle: 'Анализирует существующий дизайн как целостный сценарий',
     features: [
-      'Upload ordered screenshots as a scenario',
-      'AI analyzes the full flow — not individual screens',
-      'Clarity scores per screen + weak spots',
-      'Identifies drop-off risks and logic gaps',
+      'Загрузи скриншоты по порядку',
+      'AI анализирует весь флоу — не отдельные экраны',
+      'Оценка ясности каждого экрана + слабые места',
+      'Выявляет точки оттока и логические пробелы',
     ],
     colorClass: 'from-cyan-500/10 to-sky-500/5 border-cyan-500/20 hover:border-cyan-500/50',
   },
@@ -69,25 +69,23 @@ export default function HomePage() {
         transition={{ duration: 0.5 }}
         className="w-full max-w-4xl"
       >
-        {/* Header */}
         <div className="text-center mb-12">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-sm font-medium mb-6">
             <Sparkles className="w-3.5 h-3.5" />
             AI Product Copilot
           </div>
           <h1 className="text-4xl font-bold tracking-tight mb-3">
-            From chaos to clarity,{' '}
+            От хаоса к ясности{' '}
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-violet-400 to-cyan-400">
-              in minutes
+              за минуты
             </span>
           </h1>
           <p className="text-muted-foreground text-lg max-w-xl mx-auto">
-            Simulate a full product team review. Turn raw ideas or existing designs into
-            structured, battle-tested product decisions.
+            Симуляция продуктовой команды. Превращает сырые идеи или готовые дизайны
+            в структурированные, проверенные продуктовые решения.
           </p>
         </div>
 
-        {/* Mode cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
           {MODES.map(({ mode, icon, title, subtitle, features, colorClass }, i) => (
             <motion.button
@@ -112,7 +110,7 @@ export default function HomePage() {
               </div>
 
               <h2 className="text-lg font-semibold mb-1">
-                {loading === mode ? 'Creating session...' : title}
+                {loading === mode ? 'Создаю сессию...' : title}
               </h2>
               <p className="text-sm text-muted-foreground mb-5">{subtitle}</p>
 
@@ -129,7 +127,7 @@ export default function HomePage() {
         </div>
 
         <p className="text-center text-xs text-muted-foreground mt-8">
-          Both modes include PM, Design Lead, and Developer reviews.
+          Оба режима завершаются ревью от PM, Design Lead и Разработчика.
         </p>
       </motion.div>
     </main>

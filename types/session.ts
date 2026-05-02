@@ -36,6 +36,7 @@ export interface UnderstandingCard {
 export interface ScreenDescription {
   screenName: string;
   purpose: string;
+  htmlContent: string;
   components: string[];
   interactions: string[];
   notes: string;

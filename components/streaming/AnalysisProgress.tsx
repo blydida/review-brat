@@ -5,15 +5,15 @@ import type { AnalysisPhase } from '@/store/session.store';
 import type { SessionMode } from '@/types/session';
 
 const IDEATION_STEPS: Array<{ phase: AnalysisPhase; label: string }> = [
-  { phase: 'understanding', label: 'Understanding' },
-  { phase: 'clarifying', label: 'Clarifying' },
-  { phase: 'generating', label: 'Generating' },
-  { phase: 'reviewing', label: 'Reviewing' },
+  { phase: 'understanding', label: 'Понимаю' },
+  { phase: 'clarifying', label: 'Уточняю' },
+  { phase: 'generating', label: 'Генерирую' },
+  { phase: 'reviewing', label: 'Ревью' },
 ];
 
 const FLOW_STEPS: Array<{ phase: AnalysisPhase; label: string }> = [
-  { phase: 'analyzing', label: 'Analyzing Flow' },
-  { phase: 'reviewing', label: 'Reviewing' },
+  { phase: 'analyzing', label: 'Анализирую' },
+  { phase: 'reviewing', label: 'Ревью' },
 ];
 
 const PHASE_ORDER: Record<AnalysisPhase, number> = {
@@ -27,12 +27,12 @@ const PHASE_ORDER: Record<AnalysisPhase, number> = {
   error: 5,
 };
 
-interface AnalysisProgressProps {
+interface Props {
   mode: SessionMode;
   activePhase: AnalysisPhase;
 }
 
-export function AnalysisProgress({ mode, activePhase }: AnalysisProgressProps) {
+export function AnalysisProgress({ mode, activePhase }: Props) {
   const steps = mode === 'ideation' ? IDEATION_STEPS : FLOW_STEPS;
   const activeOrder = PHASE_ORDER[activePhase] ?? -1;
 
@@ -46,24 +46,12 @@ export function AnalysisProgress({ mode, activePhase }: AnalysisProgressProps) {
         return (
           <div key={phase} className="flex items-center gap-1">
             <div className={`flex items-center gap-1.5 text-xs px-2 py-1 rounded-full transition-colors ${
-              isDone
-                ? 'text-emerald-500'
-                : isActive
-                  ? 'text-foreground bg-muted'
-                  : 'text-muted-foreground'
+              isDone ? 'text-emerald-500' : isActive ? 'text-foreground bg-muted' : 'text-muted-foreground'
             }`}>
-              {isDone ? (
-                <CheckCircle className="w-3 h-3" />
-              ) : isActive ? (
-                <Loader2 className="w-3 h-3 animate-spin" />
-              ) : (
-                <Circle className="w-3 h-3" />
-              )}
+              {isDone ? <CheckCircle className="w-3 h-3" /> : isActive ? <Loader2 className="w-3 h-3 animate-spin" /> : <Circle className="w-3 h-3" />}
               {label}
             </div>
-            {i < steps.length - 1 && (
-              <span className="text-muted-foreground/40 text-xs">›</span>
-            )}
+            {i < steps.length - 1 && <span className="text-muted-foreground/40 text-xs">›</span>}
           </div>
         );
       })}

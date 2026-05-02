@@ -11,8 +11,7 @@ import { DesignSystemInput } from '@/components/upload/DesignSystemInput';
 import { AnalysisProgress } from '@/components/streaming/AnalysisProgress';
 import { UnderstandingCard } from '@/components/analysis/UnderstandingCard';
 import { ClarificationQA } from '@/components/analysis/ClarificationQA';
-import { UserFlowDiagram } from '@/components/analysis/UserFlowDiagram';
-import { ScreenDescriptions } from '@/components/analysis/ScreenDescriptions';
+import { PhoneMockup } from '@/components/analysis/PhoneMockup';
 import { FlowAnalysis } from '@/components/analysis/FlowAnalysis';
 import { ReviewPanel } from '@/components/review/ReviewPanel';
 import { Button } from '@/components/ui/button';
@@ -96,9 +95,8 @@ export default function SessionPage({ params }: PageProps) {
   const result = session.analysisResult;
   const isActive = store.activePhase !== 'idle' && store.activePhase !== 'complete' && store.activePhase !== 'error';
   const showOutput = result?.understandingCard || result?.flowAnalysis || result?.screenDescriptions || result?.roleReviews;
-
-  const canStartAnalysis = hasUploads && store.activePhase === 'idle' && session.status !== 'complete';
-  const showClarification = store.activePhase === 'clarifying' || session.status === 'clarifying';
+  const canStartAnalysis = (hasUploads || store.textContent.trim()) && store.activePhase === 'idle' && session.status !== 'complete';
+  const showClarification = (store.activePhase === 'clarifying' || session.status === 'clarifying') && store.pendingQuestions.length > 0;
   const showReviewButton = (session.status === 'reviewing' || store.activePhase === 'reviewing') && !result?.roleReviews?.length;
 
   return (
@@ -109,8 +107,8 @@ export default function SessionPage({ params }: PageProps) {
           <button onClick={() => router.push('/')} className="p-1.5 rounded-lg hover:bg-muted transition-colors">
             <ArrowLeft className="w-4 h-4" />
           </button>
-          <Badge variant="outline" className="text-xs capitalize">
-            {session.mode === 'ideation' ? 'Ideation → Structure' : 'Flow Review'}
+          <Badge variant="outline" className="text-xs">
+            {session.mode === 'ideation' ? 'Идея → Структура' : 'Ревью флоу'}
           </Badge>
         </div>
 
@@ -121,51 +119,47 @@ export default function SessionPage({ params }: PageProps) {
             className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground px-2.5 py-1.5 rounded-lg hover:bg-muted transition-colors"
           >
             {copied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
-            {copied ? 'Copied' : 'Share'}
+            {copied ? 'Скопировано' : 'Поделиться'}
           </button>
         </div>
       </header>
 
-      {/* Main content */}
       <div className="flex-1 flex flex-col lg:flex-row">
         {/* Left panel — Input */}
-        <aside className="w-full lg:w-[380px] lg:border-r border-border p-5 space-y-5 shrink-0">
-          {/* Text input for ideation mode */}
+        <aside className="w-full lg:w-[360px] lg:border-r border-border p-5 space-y-4 shrink-0">
           {session.mode === 'ideation' && (
             <div className="space-y-2">
               <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-                Product Input
+                Описание продукта
               </label>
               <Textarea
                 value={store.textContent}
                 onChange={(e) => store.setTextContent(e.target.value)}
-                placeholder="Paste your PRD, user story, notes, or describe the feature you want to build..."
+                placeholder="Вставь PRD, пользовательскую историю, заметки или опиши фичу которую хочешь создать..."
                 className="min-h-[120px] text-sm resize-none"
                 disabled={isActive}
               />
             </div>
           )}
 
-          {/* Goal input for flow review mode */}
           {session.mode === 'flow-review' && (
             <div className="space-y-2">
               <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-                Scenario Goal
+                Цель сценария
               </label>
               <Textarea
                 value={store.flowGoal}
                 onChange={(e) => store.setFlowGoal(e.target.value)}
-                placeholder="What is the user trying to accomplish in this flow? e.g. 'User completes onboarding and creates their first project'"
+                placeholder="Что пользователь пытается сделать в этом флоу? Например: 'Пользователь проходит онбординг и создаёт первый проект'"
                 className="min-h-[80px] text-sm resize-none"
                 disabled={isActive}
               />
             </div>
           )}
 
-          {/* File uploads */}
           <div className="space-y-2">
             <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-              {session.mode === 'ideation' ? 'Attachments (optional)' : 'Screenshots'}
+              {session.mode === 'ideation' ? 'Файлы (необязательно)' : 'Скриншоты'}
             </label>
             <DropZone
               sessionId={sessionId}
@@ -174,35 +168,30 @@ export default function SessionPage({ params }: PageProps) {
             />
           </div>
 
-          {/* Design system */}
-          <DesignSystemInput
-            sessionId={sessionId}
-            onSaved={() => {}}
-          />
+          <DesignSystemInput sessionId={sessionId} onSaved={() => {}} />
 
-          {/* Start button */}
           {store.activePhase === 'idle' && session.status !== 'complete' && (
             <Button
               onClick={handleStartAnalysis}
-              disabled={!canStartAnalysis && session.mode === 'flow-review'}
+              disabled={!canStartAnalysis}
               className="w-full"
               size="lg"
             >
               <Play className="w-4 h-4 mr-2" />
-              {session.mode === 'ideation' ? 'Analyze & Generate Flow' : 'Analyze Flow'}
+              {session.mode === 'ideation' ? 'Анализировать и сгенерировать' : 'Анализировать флоу'}
             </Button>
           )}
 
           {store.activePhase === 'error' && (
             <div className="flex items-start gap-2 p-3 rounded-lg border border-red-500/30 bg-red-500/5 text-red-400 text-sm">
               <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
-              {store.errorMessage ?? 'Analysis failed. Please try again.'}
+              {store.errorMessage ?? 'Анализ не удался. Попробуй ещё раз.'}
             </div>
           )}
         </aside>
 
         {/* Right panel — Output */}
-        <main className="flex-1 p-5 space-y-5 overflow-y-auto">
+        <main className="flex-1 p-5 space-y-6 overflow-y-auto">
           {!showOutput && store.activePhase === 'idle' && (
             <div className="flex flex-col items-center justify-center h-full text-center py-20">
               <div className="text-4xl mb-4">
@@ -210,19 +199,17 @@ export default function SessionPage({ params }: PageProps) {
               </div>
               <p className="text-muted-foreground text-sm max-w-xs">
                 {session.mode === 'ideation'
-                  ? 'Add your product input and optional files, then click Analyze to get started.'
-                  : 'Upload your screenshots in order and describe the scenario goal, then click Analyze.'}
+                  ? 'Добавь описание продукта и нажми «Анализировать» — получишь детализированные экраны с дизайном.'
+                  : 'Загрузи скриншоты по порядку и опиши цель сценария, затем нажми «Анализировать».'}
               </p>
             </div>
           )}
 
-          {/* Understanding card */}
           {result?.understandingCard && (
             <UnderstandingCard data={result.understandingCard} />
           )}
 
-          {/* Clarification Q&A */}
-          {showClarification && store.pendingQuestions.length > 0 && (
+          {showClarification && (
             <ClarificationQA
               sessionId={sessionId}
               questions={store.pendingQuestions}
@@ -231,40 +218,37 @@ export default function SessionPage({ params }: PageProps) {
             />
           )}
 
-          {/* Mode 1 outputs */}
-          {result?.flowDiagram && <UserFlowDiagram diagram={result.flowDiagram} />}
-          {result?.screenDescriptions && result.screenDescriptions.length > 0 && (
-            <ScreenDescriptions screens={result.screenDescriptions} />
+          {/* Streaming preview */}
+          {store.generationDelta && store.activePhase === 'generating' && (
+            <div className="rounded-xl border border-border bg-card p-5">
+              <div className="flex items-center gap-2 mb-3">
+                <Loader2 className="w-3.5 h-3.5 animate-spin text-muted-foreground" />
+                <h3 className="text-sm font-semibold text-muted-foreground">Генерирую экраны...</h3>
+              </div>
+              <pre className="text-xs text-muted-foreground whitespace-pre-wrap font-mono leading-relaxed max-h-40 overflow-hidden">
+                {store.generationDelta.slice(0, 400)}...
+              </pre>
+            </div>
           )}
 
-          {/* Mode 2 outputs */}
+          {/* Phone mockups */}
+          {result?.screenDescriptions && result.screenDescriptions.length > 0 && (
+            <PhoneMockup screens={result.screenDescriptions} />
+          )}
+
           {result?.flowAnalysis && <FlowAnalysis data={result.flowAnalysis} />}
 
-          {/* Start review button */}
           {showReviewButton && (
             <div className="flex justify-center py-4">
               <Button onClick={handleStartReview} size="lg">
                 <Play className="w-4 h-4 mr-2" />
-                Run Team Review (PM + Design + Dev)
+                Запустить ревью команды (PM + Дизайн + Разработка)
               </Button>
             </div>
           )}
 
-          {/* Review panel */}
           {result?.roleReviews && result.roleReviews.length > 0 && (
             <ReviewPanel reviews={result.roleReviews} />
-          )}
-
-          {/* Streaming generation preview */}
-          {store.generationDelta && store.activePhase === 'generating' && (
-            <div className="rounded-xl border border-border bg-card p-5">
-              <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-3">
-                Generating...
-              </h3>
-              <pre className="text-xs text-muted-foreground whitespace-pre-wrap font-mono leading-relaxed">
-                {store.generationDelta}
-              </pre>
-            </div>
           )}
         </main>
       </div>

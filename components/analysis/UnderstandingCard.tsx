@@ -4,15 +4,15 @@ import { motion } from 'framer-motion';
 import { Target, TrendingUp, Zap } from 'lucide-react';
 import type { UnderstandingCard as UnderstandingCardType } from '@/types/session';
 
+const SECTIONS = [
+  { key: 'userGoals' as const, label: 'Цели пользователя', icon: <Target className="w-4 h-4" />, color: 'text-violet-400' },
+  { key: 'businessGoals' as const, label: 'Бизнес-цели', icon: <TrendingUp className="w-4 h-4" />, color: 'text-cyan-400' },
+  { key: 'keyMechanics' as const, label: 'Ключевые механики', icon: <Zap className="w-4 h-4" />, color: 'text-amber-400' },
+];
+
 interface Props {
   data: UnderstandingCardType;
 }
-
-const SECTIONS = [
-  { key: 'userGoals' as const, label: 'User Goals', icon: <Target className="w-4 h-4" />, color: 'text-violet-400' },
-  { key: 'businessGoals' as const, label: 'Business Goals', icon: <TrendingUp className="w-4 h-4" />, color: 'text-cyan-400' },
-  { key: 'keyMechanics' as const, label: 'Key Mechanics', icon: <Zap className="w-4 h-4" />, color: 'text-amber-400' },
-];
 
 export function UnderstandingCard({ data }: Props) {
   return (
@@ -22,7 +22,7 @@ export function UnderstandingCard({ data }: Props) {
       className="rounded-xl border border-border bg-card p-5 space-y-5"
     >
       <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
-        AI Understanding
+        Понимание задачи
       </h3>
 
       <div className="grid gap-4">

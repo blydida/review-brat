@@ -4,11 +4,11 @@ export function parseGenerationResponse(text: string): {
   flowDiagram: FlowDiagram;
   screenDescriptions: ScreenDescription[];
 } {
-  // Extract Mermaid block
+  // Extract mermaid block if present (optional now)
   const mermaidMatch = text.match(/```mermaid\s*([\s\S]*?)\s*```/);
-  const mermaidSource = mermaidMatch ? mermaidMatch[1].trim() : 'flowchart LR\n  A[Start] --> B[End]';
+  const mermaidSource = mermaidMatch ? mermaidMatch[1].trim() : '';
 
-  // Extract JSON block for screen descriptions
+  // Extract JSON block
   const jsonMatch = text.match(/```json\s*([\s\S]*?)\s*```/);
   let screenDescriptions: ScreenDescription[] = [];
 
@@ -17,15 +17,16 @@ export function parseGenerationResponse(text: string): {
       const parsed = JSON.parse(jsonMatch[1]);
       if (Array.isArray(parsed)) {
         screenDescriptions = parsed.map((s) => ({
-          screenName: s.screenName ?? 'Untitled Screen',
+          screenName: s.screenName ?? 'Без названия',
           purpose: s.purpose ?? '',
+          htmlContent: s.htmlContent ?? '',
           components: s.components ?? [],
           interactions: s.interactions ?? [],
           notes: s.notes ?? '',
         }));
       }
     } catch {
-      // malformed JSON — return empty screens
+      // malformed JSON
     }
   }
 

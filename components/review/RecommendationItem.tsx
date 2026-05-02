@@ -11,21 +11,20 @@ const PRIORITY_STYLE = {
 
 interface Props {
   rec: Recommendation;
+  priorityLabel?: string;
 }
 
-export function RecommendationItem({ rec }: Props) {
+export function RecommendationItem({ rec, priorityLabel }: Props) {
   return (
     <div className="p-3 rounded-lg border border-border bg-background/40 space-y-2">
-      <div className="flex items-start justify-between gap-2">
-        <div className="flex items-center gap-2 flex-wrap">
-          <Badge variant="outline" className={`text-xs ${PRIORITY_STYLE[rec.priority]}`}>
-            {rec.priority}
-          </Badge>
-          <span className="text-xs text-muted-foreground">{rec.category}</span>
-          {rec.affectedArea && (
-            <span className="text-xs text-muted-foreground">· {rec.affectedArea}</span>
-          )}
-        </div>
+      <div className="flex items-center gap-2 flex-wrap">
+        <Badge variant="outline" className={`text-xs ${PRIORITY_STYLE[rec.priority]}`}>
+          {priorityLabel ?? rec.priority}
+        </Badge>
+        <span className="text-xs text-muted-foreground">{rec.category}</span>
+        {rec.affectedArea && (
+          <span className="text-xs text-muted-foreground">· {rec.affectedArea}</span>
+        )}
       </div>
       <p className="text-sm font-medium leading-snug">{rec.issue}</p>
       <p className="text-xs text-muted-foreground leading-relaxed border-l-2 border-border pl-3">
